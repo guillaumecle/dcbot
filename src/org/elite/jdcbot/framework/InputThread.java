@@ -26,8 +26,9 @@ import java.io.*;
  * Threads that reads raw commands from hub and passes them to jDCBot.
  *
  * @since 0.5
- * @author  Kokanovic Branko
+ * @author Kokanovic Branko
  * @author AppleGrew
+ * @author Clement
  * @version 0.7
  * 
  */
@@ -62,7 +63,7 @@ public class InputThread extends DCIO implements Runnable {
 			}
 		} catch (Exception e) {
 //			System.err.println(this);
-			if (!e.getMessage().equals("socket closed"))
+			if (!e.getMessage().equalsIgnoreCase("socket closed"))
 					e.printStackTrace();
 			_inputThreadTrgt.onDisconnect();
 		}
