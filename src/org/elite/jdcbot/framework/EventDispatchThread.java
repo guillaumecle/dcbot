@@ -37,62 +37,62 @@ import java.util.List;
  * Sorry.
  */
 public class EventDispatchThread extends Thread {
-    private List<DispatchEntity> dispatch;
-    private volatile boolean running;
+	private List<DispatchEntity> dispatch;
+	private volatile boolean running;
 
-    public EventDispatchThread() {
-	super("jDCBot-EventDispatchThread");
-	dispatch = Collections.synchronizedList(new ArrayList<DispatchEntity>());
-	running = true;
-	start();
-    }
-
-    public void run() {
-	while (running) {
-	    while (!dispatch.isEmpty()) {
-		DispatchEntity de = dispatch.get(0);
-		dispatch.remove(0);
-		if (de.method != null) {
-		    try {
-			de.method.invoke(de.owner, de.params);
-		    } catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		    } catch (IllegalAccessException e) {
-			e.printStackTrace();
-		    } catch (InvocationTargetException e) {
-			e.printStackTrace();
-		    }
-		}
-	    }
-	    try {
-		sleep(60000L);
-	    } catch (InterruptedException e) {}
+	public EventDispatchThread() {
+		super("jDCBot-EventDispatchThread");
+		dispatch = Collections.synchronizedList(new ArrayList<DispatchEntity>());
+		running = true;
+		start();
 	}
-    }
 
-    /**
-     * Use this to invoke a call to a method via this (jDCBot-EventDispatchThread) thread.
-     * @param owner The object of whom <i>method</i> is memeber.
-     * @param method The case-sensitive name of the method. This can be public <b>only</b>.
-     * @param args All the arguments of the <i>method</i>.<br>
-     * <b>Note:</b><br>
-     * <ul>
-     * <li>If <i>method</i> has no arguments then no need to pass
-     * any any argument to this parameter, it is a varag and will automatically set to null.<br></li>
-     * <li>If you need to supply any primitive data types e.g. int then wrap it in its corresponding wrapper class
-     * then wrap that class inside {@link PrimitiveWrapper PrimitiveWrapper}. e.g. If you need to pass<br>
-     * <code>int i;</code><br>
-     * then wrap <i>i</i> as below.<br>
-     * <code>
-     * new PrimitiveWrapper&lt;Integer&gt;(new Integer(i))
-     * </code><br></li>
-     * <li>Also note that passing sub-class of a class won't match, i.e. if the method has argument type Exception then
-     * passing IOException won't match. If need to do so then use {@link #call(Object, String, Class[], Object[]) call}</li>
-     * <li>You cannot use this method if any of the passed arguments needs to be set to null. For such a call you need to use
-     * {@link #call(Object, String, Class[], Object[]) call}.</li>
-     * </ul>
-     */
-    /*public void call(Object owner, String method, Object... args) {
+	public void run() {
+		while (running) {
+			while (!dispatch.isEmpty()) {
+				DispatchEntity de = dispatch.get(0);
+				dispatch.remove(0);
+				if (de.method != null) {
+					try {
+						de.method.invoke(de.owner, de.params);
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			try {
+				sleep(60000L);
+			} catch (InterruptedException e) {}
+		}
+	}
+
+	/**
+	 * Use this to invoke a call to a method via this (jDCBot-EventDispatchThread) thread.
+	 * @param owner The object of whom <i>method</i> is memeber.
+	 * @param method The case-sensitive name of the method. This can be public <b>only</b>.
+	 * @param args All the arguments of the <i>method</i>.<br>
+	 * <b>Note:</b><br>
+	 * <ul>
+	 * <li>If <i>method</i> has no arguments then no need to pass
+	 * any any argument to this parameter, it is a varag and will automatically set to null.<br></li>
+	 * <li>If you need to supply any primitive data types e.g. int then wrap it in its corresponding wrapper class
+	 * then wrap that class inside {@link PrimitiveWrapper PrimitiveWrapper}. e.g. If you need to pass<br>
+	 * <code>int i;</code><br>
+	 * then wrap <i>i</i> as below.<br>
+	 * <code>
+	 * new PrimitiveWrapper&lt;Integer&gt;(new Integer(i))
+	 * </code><br></li>
+	 * <li>Also note that passing sub-class of a class won't match, i.e. if the method has argument type Exception then
+	 * passing IOException won't match. If need to do so then use {@link #call(Object, String, Class[], Object[]) call}</li>
+	 * <li>You cannot use this method if any of the passed arguments needs to be set to null. For such a call you need to use
+	 * {@link #call(Object, String, Class[], Object[]) call}.</li>
+	 * </ul>
+	 */
+	/*public void call(Object owner, String method, Object... args) {
      Class params[] = null;
      if (args != null)
      params = new Class[args.length];
@@ -110,57 +110,57 @@ public class EventDispatchThread extends Thread {
      call(owner, method, params, args);
      }*/
 
-    /**
-     * Use this to invoke a call to a method via this (jDCBot-EventDispatchThread) thread, but you will also need to
-     * specify arguments' types in <i>param_types</i> argument.
-     * @param owner The object of whom <i>method</i> is memeber.
-     * @param method The case-sensitive name of the method. This can be public <b>only</b>.
-     * @param param_types The array of arguments' types.
-     * <b>Note:</b><br>
-     * <ul>
-     * <li>If you need to supply any primitive data types e.g. int then pass its primitive class type. e.g. If you need to pass<br>
-     * <code>int i;</code><br>
-     * then pass as its class type as shown below.<br>
-     * <code>
-     * new Class[]{int.class}
-     * </code><br>
-     * There is no need for using {@link PrimitiveWrapper PrimitiveWrapper}.</li>
-     * </ul>
-     * @param args All the arguments of the <i>method</i>.<br>
-     * <b>Note:</b><br>
-     * <ul>
-     * <li>If <i>method</i> has no arguments then no need to pass
-     * any any argument to this parameter, it is a varag and will automatically set to null.<br></li>
-     * </ul>
-     */
-    public void call(Object owner, String method, Class param_types[], Object... args) {
-	Method m = null;
-	try {
-	    m = owner.getClass().getMethod(method, param_types);
-	} catch (SecurityException e) {
-	    e.printStackTrace();
-	    return;
-	} catch (NoSuchMethodException e) {
-	    e.printStackTrace();
-	    return;
+	/**
+	 * Use this to invoke a call to a method via this (jDCBot-EventDispatchThread) thread, but you will also need to
+	 * specify arguments' types in <i>param_types</i> argument.
+	 * @param owner The object of whom <i>method</i> is memeber.
+	 * @param method The case-sensitive name of the method. This can be public <b>only</b>.
+	 * @param param_types The array of arguments' types.
+	 * <b>Note:</b><br>
+	 * <ul>
+	 * <li>If you need to supply any primitive data types e.g. int then pass its primitive class type. e.g. If you need to pass<br>
+	 * <code>int i;</code><br>
+	 * then pass as its class type as shown below.<br>
+	 * <code>
+	 * new Class[]{int.class}
+	 * </code><br>
+	 * There is no need for using {@link PrimitiveWrapper PrimitiveWrapper}.</li>
+	 * </ul>
+	 * @param args All the arguments of the <i>method</i>.<br>
+	 * <b>Note:</b><br>
+	 * <ul>
+	 * <li>If <i>method</i> has no arguments then no need to pass
+	 * any any argument to this parameter, it is a varag and will automatically set to null.<br></li>
+	 * </ul>
+	 */
+	public void call(Object owner, String method, Class param_types[], Object... args) {
+		Method m = null;
+		try {
+			m = owner.getClass().getMethod(method, param_types);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+			return;
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+			return;
+		}
+		DispatchEntity de = new DispatchEntity();
+		de.method = m;
+		de.owner = owner;
+		de.params = args;
+		dispatch.add(de);
+
+		this.interrupt();
 	}
-	DispatchEntity de = new DispatchEntity();
-	de.method = m;
-	de.owner = owner;
-	de.params = args;
-	dispatch.add(de);
 
-	this.interrupt();
-    }
+	public void stopIt() {
+		running = false;
+		this.interrupt();
+	}
 
-    public void stopIt() {
-	running = false;
-	this.interrupt();
-    }
-
-    private class DispatchEntity {
-	public Method method;
-	public Object owner;
-	public Object params[];
-    }
+	private class DispatchEntity {
+		public Method method;
+		public Object owner;
+		public Object params[];
+	}
 }
