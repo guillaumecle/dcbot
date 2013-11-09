@@ -47,21 +47,13 @@ public class DownloadBot extends jDCBot {
 	private String _clientName;
 	private boolean _terminated;
 	private OutputStream _os;
+	private boolean _debug;
 
-	public DownloadBot(String botName, String botIp, String hubIp, String clientName, OutputStream os, PrintStream logStream, int userSearchDuration) {
-		this(botName, botIp, hubIp, clientName, os, logStream, 60, userSearchDuration);
+	public DownloadBot(String botName, String botIp, String hubIp, String clientName, OutputStream os, PrintStream logStream, int userSearchDuration, boolean debug) {
+		this(botName, botIp, hubIp, clientName, os, logStream, 60, userSearchDuration, debug);
 	}
-	/**
-	 * 
-	 * @param botName
-	 * @param botIp
-	 * @param hubIp
-	 * @param clientName
-	 * @param fileName
-	 * @param timeOut
-	 */
-	public DownloadBot(String botName, String botIp, String hubIp, String clientName,
-			OutputStream os, PrintStream logStream, int timeOut, int userSearchDuration) {
+
+	public DownloadBot(String botName, String botIp, String hubIp, String clientName, OutputStream os, PrintStream logStream, int timeOut, int userSearchDuration, boolean debug) {
 		super(botName, // Bot's name
 				botIp, // Bot's IP
 				9020, // Bot's listen port
@@ -73,13 +65,13 @@ public class DownloadBot extends jDCBot {
 				3, // No. of upload slots
 				3, // No of download slots.
 				false, // Is passive
-				logStream, // PrintStream where debug messages will go
+				createLogStream(logStream), // PrintStream where debug messages will go
 				userSearchDuration
 				);
 //		_fileName = fileName;
 		_os = os;
 		_clientName = clientName;
-
+		_debug = debug;
 		try {
 			connect(hubIp, 411);
 		} catch (Exception e) {
@@ -97,6 +89,18 @@ public class DownloadBot extends jDCBot {
 		}
 	}
 
+	private static PrintStream createLogStream(PrintStream logStream) {
+		if (logStream != null)
+			return logStream;
+		return new PrintStream(new OutputStream() {
+
+			@Override
+			public void write(int arg0) throws IOException {
+
+			}
+		});
+	}
+	
 	private void pm(String user, String msg) {
 		try {
 			SendPrivateMessage(user, msg);
@@ -115,7 +119,8 @@ public class DownloadBot extends jDCBot {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			System.out.println("Liste de fichiers récupérée");
+			if (_debug)
+				System.out.println("Liste de fichiers récupérée");
 		} else {
 			pm(user.username(), "I got this exception: " + e.getMessage());
 			System.out.println("Echec de la récupération de la liste de fichiers");
@@ -126,9 +131,11 @@ public class DownloadBot extends jDCBot {
 
 	@Override
 	protected void onConnect() {
-		System.out.println("Connecté");
+		if (_debug)
+			System.out.println("Connecté");
 		if (um.userExist(_clientName)) {
-			System.out.println("Utilisateur trouvé");
+			if (_debug)
+				System.out.println("Utilisateur trouvé");
 			User clem = getUser(_clientName);
 			if (clem != null)
 				try {
