@@ -63,8 +63,12 @@ public class InputThread extends DCIO implements Runnable {
 			}
 		} catch (Exception e) {
 //			System.err.println(this);
-			if (!e.getMessage().equalsIgnoreCase("socket closed"))
-					e.printStackTrace();
+//			System.out.println(e.getMessage());
+			if (!e.getMessage().equalsIgnoreCase("socket closed")) {
+				e.printStackTrace();
+//				System.out.println("aaa");
+//				System.out.println(e.getMessage());
+			}
 			_inputThreadTrgt.onDisconnect();
 		}
 	}

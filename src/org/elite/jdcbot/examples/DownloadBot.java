@@ -89,8 +89,14 @@ public class DownloadBot extends jDCBot {
 		}
 		if (_debug)
 			System.out.println("terminated : " + _terminated);
-//		if (!_terminated)
+		if (!_terminated) {
+//			System.out.println("fin sur time out");
+//			System.out.println("My Term");
 			terminate();
+		} else {
+//			System.out.println("fin a la reception du fichier");
+		}
+//			terminate();
 	}
 
 	private static PrintStream createLogStream(PrintStream logStream) {
@@ -130,6 +136,8 @@ public class DownloadBot extends jDCBot {
 			System.out.println("Echec de la récupération de la liste de fichiers");
 		}
 		_terminated = true;
+		if (_debug)
+			System.out.println("terminate from onDownload complet");
 		terminate();
 	}
 
@@ -150,6 +158,13 @@ public class DownloadBot extends jDCBot {
 					System.out.println("Echec de la récupération de la liste de fichiers");
 					System.out.println("Exception : "+e.getMessage());
 				}
+		} else {
+			if (_debug) {
+				System.out.println("Utilisateur introuvable");
+				_terminated = true;
+				System.out.println("terminate from user infoundabe");
+				terminate();
+			}
 		}
 	}
 }

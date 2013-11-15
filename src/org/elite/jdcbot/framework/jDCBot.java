@@ -586,12 +586,32 @@ public abstract class jDCBot extends InputThreadTarget {
 	 *
 	 */
 	public void terminate() {
+//		Socket a = socket;
+//		System.out.println(socket);
+//		System.out.println(Thread.currentThread());
 		quit();
+//		System.out.println(socket);
+//		System.out.println(a);
 		uploadManager.close();
 		downloadManager.close();
-		_inputThread.stop();
+		if (_inputThread != null)
+			_inputThread.stop();
 		dispatchThread.stopIt();
 //		quit();
+//		System.out.println(socket);
+//		if (socket != null)
+//			System.out.println(socket.isClosed());
+//		System.out.println(socketServer);
+		if (socketServer != null) {
+//			System.out.println(socketServer.isClosed());
+			try {
+				socketServer.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+//		System.out.println("terminated() done");
 	}
 
 	/**
