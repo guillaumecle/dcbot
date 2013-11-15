@@ -586,12 +586,12 @@ public abstract class jDCBot extends InputThreadTarget {
 	 *
 	 */
 	public void terminate() {
-//		quit();
+		quit();
 		uploadManager.close();
 		downloadManager.close();
 		_inputThread.stop();
 		dispatchThread.stopIt();
-		quit();
+//		quit();
 	}
 
 	/**

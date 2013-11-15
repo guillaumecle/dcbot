@@ -87,6 +87,10 @@ public class DownloadBot extends jDCBot {
 			}
 			c++;
 		}
+		if (_debug)
+			System.out.println("terminated : " + _terminated);
+//		if (!_terminated)
+			terminate();
 	}
 
 	private static PrintStream createLogStream(PrintStream logStream) {
